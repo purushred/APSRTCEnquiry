@@ -33,11 +33,11 @@
             </AutoCompleteTextView>
 
             <Button
-                android:id="@+id/checkButton1"
+                android:id="@+id/fromSearchButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/search_button"
-                android:onClick="searchButtonClickHandler" />
+                android:onClick="fromSearchButtonClickHandler" />
         </LinearLayout>
 
         <LinearLayout
@@ -55,20 +55,17 @@
                 android:textColor="@android:color/black" />
 
             <Button
-                android:id="@+id/checkButton2"
+                android:id="@+id/toSearchButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/search_button"
-                android:onClick="searchButtonClickHandler" />
+                android:onClick="toSearchButtonClickHandler" />
         </LinearLayout>
 
         <EditText
             android:id="@+id/journeyDateTextField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:editable="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
             android:hint="@string/date_str"
             android:inputType="date" >
         </EditText>

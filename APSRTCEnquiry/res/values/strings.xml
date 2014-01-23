@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    
     <string name="app_name">APSRTC Bus Enquiry</string>
     <string name="from_str">From</string>
     <string name="to_str">To</string>

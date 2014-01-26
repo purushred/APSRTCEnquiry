@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-    <string name="app_name">APSRTC Bus Enquiry</string>
+
+    <string name="app_name">APSRTC Ticket Availability</string>
     <string name="from_str">From</string>
     <string name="to_str">To</string>
     <string name="date_str">Journey Date</string>
@@ -10,22 +10,20 @@
     <string name="search_str">Search</string>
     <string name="save_str">Save</string>
     <string name="arrow">Arrow</string>
+
     <string-array name="serviceTypeArray">
-        <item >All</item>
-        <item >A/C Bus</item>
-        <item >Non-AC Bus</item>
+        <item>A/C Service</item>
+        <item>Non-A/C Service</item>
     </string-array>
-        <string name="service_number">No</string>
-        <string name="service_type">Type</string>
-        <string name="start_time">Start</string>
-        <string name="reach_time">Reach</string>
-        <string name="availibility">Availability</string>
-        <string name="sync_text">To sync with the data available online. Please sync the data on regular basis.</string>
-        <string name="favourites_str">Favourites</string>
-        <string name="menu_settings">Menu Settings</string>
-        <string name="apsrtc_enquiry">APSRTC Enquiry</string>
-        <string name="sync_data_msg">Synching Data...</string>
-        <string name="sync_button_label">Sync Data</string>
-        <string name="favourites">Favourites</string>
+
+    <string name="previousDate">&lt;</string>
+    <string name="nextDate">&gt;</string>
+    <string name="refresh_image">Refresh Image</string>
+    <string name="back_image">Back Image</string>
+    <string name="previous_date">Previous Date</string>
+    <string name="searching">Searching..</string>
+    <string name="station_field_validation">Please enter 3 characters.</string>
+    <string name="journey_date_validation">Journey date should be greater than today\'s date.</string>
+    <string name="communication_error">Communication error. Please try again.</string>
 
 </resources>

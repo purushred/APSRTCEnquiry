@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
@@ -16,8 +17,8 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -33,6 +34,7 @@
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal" >
 
@@ -45,20 +47,23 @@
                     android:completionThreshold="2"
                     android:hint="@string/from_str"
                     android:singleLine="true"
-                    android:textColor="@android:color/black" />
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
 
-                <Button
+                <ImageView
                     android:id="@+id/fromSearchButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_weight="0.25"
-                    android:drawableLeft="@drawable/search_button"
-                    android:onClick="fromSearchButtonClickHandler" />
+                    android:contentDescription="@string/search_str"
+                    android:onClick="fromSearchButtonClickHandler"
+                    android:src="@drawable/ic_action_search" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal" >
 
@@ -69,45 +74,84 @@
                     android:layout_weight="0.75"
                     android:hint="@string/to_str"
                     android:singleLine="true"
-                    android:textColor="@android:color/black" />
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
 
-                <Button
+                <ImageView
                     android:id="@+id/toSearchButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_weight="0.25"
-                    android:drawableLeft="@drawable/search_button"
-                    android:onClick="toSearchButtonClickHandler" />
+                    android:contentDescription="@string/search_str"
+                    android:onClick="toSearchButtonClickHandler"
+                    android:src="@drawable/ic_action_search" />
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/journeyDateTextField"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/date_str"
-                android:inputType="date" >
-            </EditText>
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
+                android:orientation="horizontal" >
 
-            <Spinner
-                android:id="@+id/serviceTypeCombo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:entries="@array/serviceTypeArray" />
+                <ImageView
+                    android:id="@+id/previousDateButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.20"
+                    android:contentDescription="@string/previousDate"
+                    android:onClick="previousDateButtonClickHandler"
+                    android:src="@drawable/ic_action_previous_item_brown" />
+
+                <Button
+                    android:id="@+id/journeyDateButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.60"
+                    android:drawableLeft="@drawable/ic_action_go_to_today"
+                    android:onClick="dateButtonClickHandler" />
+
+                <ImageView
+                    android:id="@+id/nextDateButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.20"
+                    android:contentDescription="@string/nextDate"
+                    android:onClick="nextDateButtonClickHandler"
+                    android:src="@drawable/ic_action_next_item_brown" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center" >
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <Spinner
+                    android:id="@+id/serviceTypeCombo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:entries="@array/serviceTypeArray"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <Button
                     android:id="@+id/searchButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/search_button"
+                    android:drawableLeft="@drawable/ic_action_search"
                     android:onClick="searchButtonClickHandler"
-                    android:text="@string/search_str" />
+                    android:text="@string/search_str"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adMobView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="a152e400ddeaf07" />
 
 </LinearLayout>

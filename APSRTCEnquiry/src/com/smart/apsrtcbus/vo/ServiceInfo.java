@@ -1,7 +1,13 @@
 package com.smart.apsrtcbus.vo;
 
-public class ServiceInfo {
+import java.io.Serializable;
 
+public class ServiceInfo implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String serviceId;
 	private String serviceCode;
 	private String serviceName;

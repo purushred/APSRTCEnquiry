@@ -1,8 +1,13 @@
 package com.smart.apsrtcbus.utilities;
 
 import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +19,8 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.smart.apsrtcbus.vo.SearchResultVO;
@@ -29,6 +36,29 @@ public class AppUtils {
 	
 	// searchType=0 for onward and 1 for return journey
 	public static final String SEARCH_URL = SITE_URL+"forward/booking/avail/services.do?adultMale=1&childMale=0&";
+	
+	/**
+	 * To check whether internet is enabled.
+	 * @param cm - Connectivity Manager class
+	 * @return true: network connected. false: network not connected.
+	 */
+	public static boolean isNetworkOnline(ConnectivityManager cm) {
+		boolean status=false;
+		try{
+			NetworkInfo netInfo = cm.getNetworkInfo(0);
+			if (netInfo != null && netInfo.getState()==NetworkInfo.State.CONNECTED) {
+				status= true;
+			}else {
+				netInfo = cm.getNetworkInfo(1);
+				if(netInfo!=null && netInfo.getState()==NetworkInfo.State.CONNECTED)
+					status= true;
+			}
+		}catch(Exception e){
+			Log.e("Network Error", e.getMessage());
+			return false;
+		}
+		return status;
+	}
 	
 	/**
 	 * This method will parse the HTML response returned from the FROM_URL
@@ -51,6 +81,12 @@ public class AppUtils {
 		return null;
 	}
 
+	/** 
+	 * This method will make it proper xml format so that it will be easy to
+	 * process.
+	 * @param response : the raw html content
+	 * @return will parse and return object.
+	 */
 	public static ArrayList<SearchResultVO> formatData(String response)
 	{
 		String strArr[] = response.split("BoxBorder");
@@ -67,7 +103,7 @@ public class AppUtils {
 			data = m.replaceAll("'0');\"/>");
 			return extractSearchData(data);
 		}
-		return null;
+		return new ArrayList<SearchResultVO>();
 	}
 	
 	/**
@@ -87,7 +123,6 @@ public class AppUtils {
 		{
 			String expression = "/table/tr[(@class='srvcLstCss_1') or (@class='srvcLstCss_0')]/td";
 			NodeList nodeList = (NodeList) xpath.compile(expression).evaluate(source, XPathConstants.NODESET);
-//			Log.e("LENGTH:", nodeList.getLength()+"");
 			for (int i = 0; i < nodeList.getLength(); i=i+13) {
 				SearchResultVO resultVO = new SearchResultVO();
 				resultVO.setServiceName(nodeList.item(i+2).getFirstChild().getNodeValue().trim());
@@ -139,5 +174,38 @@ public class AppUtils {
 			Log.e("APSRTC",e.getMessage());
 		}
 		return serviceInfoList;
+	}
+	
+	
+	/**
+	 * This method is to increment/decrement a date by 1 day.
+	 * @param operation - -1 for decrement and 1 for increment.
+	 * @param dateStr : Input date string which is to be incremented/decremented.
+	 * @return New date string will be returned.
+	 */
+	public static String getNewDate(int operation,String dateStr)
+	{
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy",Locale.US);
+		try {
+			Date date = formatter.parse(dateStr);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			switch(operation)
+			{
+			case -1:
+				cal.add(Calendar.DAY_OF_MONTH, -1);
+				break;
+			case 1:
+				cal.add(Calendar.DAY_OF_MONTH, 1);
+				break;
+			}
+
+			Date newDate = cal.getTime();
+			return formatter.format(newDate);
+			
+		} catch (ParseException e) {
+			Log.e("Error", e.getMessage());
+		}
+		return null;
 	}
 }

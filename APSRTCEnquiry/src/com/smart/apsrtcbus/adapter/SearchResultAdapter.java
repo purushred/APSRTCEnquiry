@@ -32,10 +32,12 @@ public class SearchResultAdapter extends ArrayAdapter<SearchResultVO>{
 		    TextView departureView = (TextView) rowView.findViewById(R.id.departureView);
 		    TextView arrivalView = (TextView) rowView.findViewById(R.id.arrivalView);
 		    TextView availableSeatsView = (TextView) rowView.findViewById(R.id.availableSeatsView);
+		    TextView fareView = (TextView) rowView.findViewById(R.id.fareView);
 		    serviceNameView.setText(list.get(position).getServiceName());
 		    departureView.setText(list.get(position).getDeparture());
 		    arrivalView.setText(list.get(position).getArrival());
 		    availableSeatsView.setText(list.get(position).getAvailableSeats());
+		    fareView.setText(list.get(position).getAdultFare());
 		    return rowView;
 	}
 }

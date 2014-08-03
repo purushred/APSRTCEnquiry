@@ -121,20 +121,22 @@ public class AppUtils {
 		InputSource source = new InputSource(new StringReader(data));
 		try 
 		{
-			String expression = "/table/tr[(@class='srvcLstCss_1') or (@class='srvcLstCss_0')]/td";
+			String expression = "/table/tr[(@class='oddRow') or (@class='evenRow')]/td";
 			NodeList nodeList = (NodeList) xpath.compile(expression).evaluate(source, XPathConstants.NODESET);
-			for (int i = 0; i < nodeList.getLength(); i=i+13) {
+			int length = nodeList.getLength();
+			if(length>1)
+			for (int i = 0; i < length; i=i+12) {
 				SearchResultVO resultVO = new SearchResultVO();
-				resultVO.setServiceName(nodeList.item(i+2).getFirstChild().getNodeValue().trim());
-				resultVO.setDepotName(nodeList.item(i+3).getFirstChild().getNodeValue().trim());
-				resultVO.setViaPlace(nodeList.item(i+4).getFirstChild().getNodeValue().trim());
-				resultVO.setDistance(nodeList.item(i+5).getFirstChild().getNodeValue().trim());
-				resultVO.setDeparture(nodeList.item(i+6).getFirstChild().getNodeValue().trim());
-				resultVO.setArrival(nodeList.item(i+7).getFirstChild().getNodeValue().trim());
-				resultVO.setAdultFare(nodeList.item(i+8).getFirstChild().getNodeValue().trim());
-				resultVO.setChildFare(nodeList.item(i+9).getFirstChild().getNodeValue().trim());
-				resultVO.setType(nodeList.item(i+10).getFirstChild().getNodeValue().trim());
-				resultVO.setAvailableSeats(nodeList.item(i+11).getFirstChild().getNodeValue().trim());
+				resultVO.setServiceName(nodeList.item(i+1).getFirstChild().getNodeValue().trim());
+				resultVO.setDepotName(nodeList.item(i+2).getFirstChild().getNodeValue().trim());
+				resultVO.setViaPlace(nodeList.item(i+3).getFirstChild().getNodeValue().trim());
+				resultVO.setDistance(nodeList.item(i+4).getFirstChild().getNodeValue().trim());
+				resultVO.setDeparture(nodeList.item(i+5).getFirstChild().getNodeValue().trim());
+				resultVO.setArrival(nodeList.item(i+6).getFirstChild().getNodeValue().trim());
+				resultVO.setAdultFare(nodeList.item(i+7).getFirstChild().getNodeValue().trim());
+				resultVO.setChildFare(nodeList.item(i+8).getFirstChild().getNodeValue().trim());
+				resultVO.setType(nodeList.item(i+9).getFirstChild().getNodeValue().trim());
+				resultVO.setAvailableSeats(nodeList.item(i+10).getFirstChild().getNodeValue().trim());
 				serviceInfoList.add(resultVO);
 //				Log.e("RESULT",resultVO.toString());
 			}

@@ -15,13 +15,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -45,7 +44,7 @@ import com.smart.apsrtcbus.utilities.AppUtils;
 import com.smart.apsrtcbus.vo.SearchResultVO;
 import com.smart.apsrtcbus.vo.ServiceInfo;
 
-public class MainActivity extends FragmentActivity implements DatePickerDialog.OnDateSetListener{
+public class MainActivity extends ActionBarActivity implements DatePickerDialog.OnDateSetListener{
 
 	private RequestQueue requestQueue = null;
 
@@ -64,16 +63,15 @@ public class MainActivity extends FragmentActivity implements DatePickerDialog.O
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		if(savedInstanceState!=null)
-			journeyDateStr = savedInstanceState.getString("journeyDate");
+		//requestWindowFeature(Window.FEATURE_NO_TITLE);
+		/*if(savedInstanceState!=null)
+			journeyDateStr = savedInstanceState.getString("journeyDate");*/
 		if(!AppUtils.isNetworkOnline((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)))
 		{
 			buildNetworkErrorUI();
 		}
 		else
 		{
-
 			displayMainScreen();
 		}
 	}
@@ -101,7 +99,6 @@ public class MainActivity extends FragmentActivity implements DatePickerDialog.O
 			public void onClick(View view) {
 				if(AppUtils.isNetworkOnline((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)))
 				{
-
 					displayMainScreen();
 				}
 			}
@@ -405,7 +402,7 @@ public class MainActivity extends FragmentActivity implements DatePickerDialog.O
 		journeyDateButton.setText(formatter.format(cal.getTime()));
 	}
 
-	@Override
+	/*@Override
 	protected void onSaveInstanceState(Bundle bundle) {
 		bundle.putSerializable("fromServiceInfo", fromServiceInfo);
 		bundle.putSerializable("toServiceInfo",toServiceInfo);
@@ -415,9 +412,12 @@ public class MainActivity extends FragmentActivity implements DatePickerDialog.O
 
 	@Override
 	protected void onRestoreInstanceState(Bundle bundle) {
-		fromServiceInfo = (ServiceInfo) bundle.getSerializable("fromServiceInfo");
-		toServiceInfo = (ServiceInfo) bundle.getSerializable("toServiceInfo");
-		journeyDateStr = bundle.getString("journeyDate");
+		if(bundle!=null)
+		{
+			fromServiceInfo = (ServiceInfo) bundle.getSerializable("fromServiceInfo");
+			toServiceInfo = (ServiceInfo) bundle.getSerializable("toServiceInfo");
+			journeyDateStr = bundle.getString("journeyDate");
+		}
 		super.onRestoreInstanceState(bundle);
-	}
+	}*/
 }

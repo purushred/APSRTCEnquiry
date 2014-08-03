@@ -16,7 +16,7 @@ public class SearchResultAdapter extends ArrayAdapter<SearchResultVO>{
 
 	private Context context = null;
 	private ArrayList<SearchResultVO> list = null;
-	
+
 	public SearchResultAdapter(Context context, ArrayList<SearchResultVO> list) {
 		super(context, R.layout.listview_row,list);
 		this.context = context;
@@ -25,19 +25,28 @@ public class SearchResultAdapter extends ArrayAdapter<SearchResultVO>{
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		LayoutInflater inflater = (LayoutInflater) context
-		        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		    View rowView = inflater.inflate(R.layout.listview_row, parent, false);
-		    TextView serviceNameView = (TextView) rowView.findViewById(R.id.serviceNameView);
-		    TextView departureView = (TextView) rowView.findViewById(R.id.departureView);
-		    TextView arrivalView = (TextView) rowView.findViewById(R.id.arrivalView);
-		    TextView availableSeatsView = (TextView) rowView.findViewById(R.id.availableSeatsView);
-		    TextView fareView = (TextView) rowView.findViewById(R.id.fareView);
-		    serviceNameView.setText(list.get(position).getServiceName());
-		    departureView.setText(list.get(position).getDeparture());
-		    arrivalView.setText(list.get(position).getArrival());
-		    availableSeatsView.setText(list.get(position).getAvailableSeats());
-		    fareView.setText(list.get(position).getAdultFare());
-		    return rowView;
+		View rowView = null;
+		if(convertView == null)
+		{
+			LayoutInflater inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			rowView = inflater.inflate(R.layout.listview_row, parent, false);
+		}
+		else
+		{
+			rowView = convertView;
+		}
+
+		TextView serviceNameView = (TextView) rowView.findViewById(R.id.serviceNameView);
+		TextView departureView = (TextView) rowView.findViewById(R.id.departureView);
+		TextView arrivalView = (TextView) rowView.findViewById(R.id.arrivalView);
+		TextView availableSeatsView = (TextView) rowView.findViewById(R.id.availableSeatsView);
+		TextView fareView = (TextView) rowView.findViewById(R.id.fareView);
+		serviceNameView.setText(list.get(position).getServiceName());
+		departureView.setText(list.get(position).getDeparture());
+		arrivalView.setText(list.get(position).getArrival());
+		availableSeatsView.setText(list.get(position).getAvailableSeats());
+		fareView.setText(list.get(position).getAdultFare());
+		return rowView;
 	}
 }

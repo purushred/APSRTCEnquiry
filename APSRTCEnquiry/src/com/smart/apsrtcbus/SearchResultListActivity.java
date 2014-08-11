@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -24,25 +25,41 @@ import com.smart.apsrtcbus.vo.SearchResultVO;
 public class SearchResultListActivity extends ActionBarActivity{
 
 	private AdView adView;
+	ArrayList<SearchResultVO> list = null;
 
-	public void onCreate(Bundle icicle) {
+	public void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(icicle);
+		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.search_results_list);
 
-		ArrayList<SearchResultVO> list = this.getIntent().getParcelableArrayListExtra("SearchResults");
+		list = this.getIntent().getParcelableArrayListExtra("SearchResults");
+		if(savedInstanceState!=null && list==null)
+		{
+
+			list = savedInstanceState.getParcelableArrayList("List");
+		}
 		final ListView listView = (ListView) findViewById(R.id.list);
 		SearchResultAdapter adapter = new SearchResultAdapter(this, list);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                    long id) {
-            	SearchResultVO resultVO = (SearchResultVO) listView.getAdapter().getItem(position);
-        		Toast.makeText(SearchResultListActivity.this, "Departure @ "+ resultVO.getDeparture(), Toast.LENGTH_LONG).show();
-            }
-        });
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position,
+					long id) {
+				if(position>0)
+				{
+					SearchResultVO resultVO = (SearchResultVO) listView.getAdapter().getItem(position);
+					Intent intent = new Intent(SearchResultListActivity.this, JourneyDetailsActivity.class);
+					intent.putExtra("SearchResultVO", resultVO);
+					intent.putExtra("FROM", SearchResultListActivity.this.getIntent().getStringExtra("FROM"));
+					intent.putExtra("TO", SearchResultListActivity.this.getIntent().getStringExtra("TO"));
+					intent.putExtra("DATE", SearchResultListActivity.this.getIntent().getStringExtra("DATE"));
+
+					startActivity(intent);
+					//Toast.makeText(SearchResultListActivity.this, "Departure @ "+ resultVO.getDeparture(), Toast.LENGTH_LONG).show();
+				}
+			}
+		});
 		TextView fromTextView = (TextView) findViewById(R.id.fromTextView);
 		TextView toTextView = (TextView) findViewById(R.id.toTextView);
 		TextView dateTextView = (TextView) findViewById(R.id.dateTextView);
@@ -67,16 +84,18 @@ public class SearchResultListActivity extends ActionBarActivity{
 		.build();
 		adView.loadAd(adRequest);
 	}
-
-
-	public void backButtonClickHandler(View view)
-	{
-		finish();
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putParcelableArrayList("List", list);
+		super.onSaveInstanceState(outState);
 	}
-
-	public void refreshButtonClickHandler(View view)
-	{
-		//Toast.makeText(this, "Refresh feature coming soon..!", Toast.LENGTH_LONG).show();
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		if(savedInstanceState!=null)
+		{
+			list = savedInstanceState.getParcelableArrayList("List");
+		}
+		super.onRestoreInstanceState(savedInstanceState);
 	}
 
 }

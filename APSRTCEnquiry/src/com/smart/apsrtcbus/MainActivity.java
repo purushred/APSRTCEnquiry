@@ -1,5 +1,7 @@
 package com.smart.apsrtcbus;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -55,17 +59,14 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 
 	private ServiceInfo fromServiceInfo = null;
 	private ServiceInfo toServiceInfo = null;
-	private String journeyDateStr = null;
 
 	private ProgressDialog progress = null;
-
+	private short serviceClassId = 0;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		//requestWindowFeature(Window.FEATURE_NO_TITLE);
-		/*if(savedInstanceState!=null)
-			journeyDateStr = savedInstanceState.getString("journeyDate");*/
 		if(!AppUtils.isNetworkOnline((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)))
 		{
 			buildNetworkErrorUI();
@@ -113,24 +114,13 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 
 		setContentView(R.layout.activity_main);
 		journeyDateButton = (Button) findViewById(R.id.journeyDateButton);
-		if(journeyDateStr!=null)
-		{
-			journeyDateButton.setText(journeyDateStr);
-		}
-		else
-		{
-			Calendar cal = Calendar.getInstance();
-			Date newDate = cal.getTime();
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy",Locale.US);
-			journeyDateButton.setText(formatter.format(newDate));	
-		}
+		getFromDB();
 
 		requestQueue = Volley.newRequestQueue(getApplicationContext());
 
 		progress = new ProgressDialog(this);
 		progress.setIndeterminate(true);
 
-		// Look up the AdView as a resource and load a request.
 		adView = (AdView)this.findViewById(R.id.adMobView);
 		AdRequest adRequest = new AdRequest.Builder()
 		.build();
@@ -156,7 +146,14 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 		progress.setMessage(getString(R.string.searching));
 		progress.show();
 		String FROM_URL = AppUtils.FROM_URL;
-		FROM_URL += fromTextView.getText();
+		String query = "";
+		try {
+			query = URLEncoder.encode(fromTextView.getText().toString().trim(), "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		FROM_URL += query ;
 		StringRequest strRequest = new StringRequest(FROM_URL, fromSeachSuccessHandler(), requestErrorHandler());
 		strRequest.setShouldCache(false);
 		requestQueue.add(strRequest);
@@ -186,7 +183,14 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 		}
 		progress.setMessage(getString(R.string.searching));
 		progress.show();
-		String TO_URL = AppUtils.TO_URL+toTextView.getText()+"&startPlaceId="+fromServiceInfo.getServiceId();
+		
+		String query = "";
+		try {
+			query = URLEncoder.encode(toTextView.getText().toString().trim(), "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String TO_URL = AppUtils.TO_URL+query+"&startPlaceId="+fromServiceInfo.getServiceId();
 		StringRequest strRequest = new StringRequest(TO_URL, toSeachSuccessHandler(), requestErrorHandler());
 		strRequest.setShouldCache(false);
 		requestQueue.add(strRequest);
@@ -240,7 +244,6 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 	 * From and To stations and will show the result in a separate activity. 
 	 * @param view
 	 */
-
 	public void searchButtonClickHandler(View v) {
 
 		Button journeyDateButton = (Button) findViewById(R.id.journeyDateButton);
@@ -274,7 +277,7 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 			Log.e("Error", e.getLocalizedMessage());
 		}
 
-		short serviceClassId = 0;
+
 		if(serviceType.equals("A/C Service"))
 		{
 			serviceClassId = 200;
@@ -292,9 +295,58 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 				"&searchType=0&startPlaceId="+fromServiceInfo.getServiceId()+
 				"&endPlaceId="+toServiceInfo.getServiceId();
 
+		storeInDB(serviceClassId,dateStr,fromServiceInfo,toServiceInfo);
 		StringRequest strRequest = new StringRequest(AppUtils.SEARCH_URL+url, mainSeachSuccessHandler(), requestErrorHandler());
 		strRequest.setShouldCache(false);
 		requestQueue.add(strRequest);
+	}
+
+	private void getFromDB(){
+		SharedPreferences pref =  getPreferences(MODE_PRIVATE);
+		String searchData = pref.getString("SEARCH_DATA", null);
+		if(searchData!=null)
+		{
+			String[] dataArr = searchData.split("#");
+			String serviceClassIdStr = dataArr[0];
+			Spinner spinner = (Spinner) findViewById(R.id.serviceTypeCombo);
+			if(serviceClassIdStr.equals("200"))
+			{
+				spinner.setSelection(0);
+				serviceClassId = 200;
+			}
+			else
+			{
+				spinner.setSelection(1);
+				serviceClassId = 201;
+			}
+
+			Button journeyDateButton = (Button) findViewById(R.id.journeyDateButton);
+			journeyDateButton.setText(dataArr[1]);
+
+			fromServiceInfo = new ServiceInfo(dataArr[2], dataArr[3], dataArr[4]);
+			toServiceInfo = new ServiceInfo(dataArr[5], dataArr[6], dataArr[7]);
+			EditText fromTextView = (EditText) findViewById(R.id.fromAuto);
+			fromTextView.setText(fromServiceInfo.getServiceName());
+			
+			EditText toTextView = (EditText) findViewById(R.id.toAuto);
+			toTextView.setText(toServiceInfo.getServiceName());
+		}
+		else
+		{
+			Calendar cal = Calendar.getInstance();
+			Date newDate = cal.getTime();
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy",Locale.US);
+			journeyDateButton.setText(formatter.format(newDate));	
+		}
+	}
+	private void storeInDB(short serviceClassId, String dateStr, ServiceInfo fromServiceInfo, ServiceInfo toServiceInfo) {
+		SharedPreferences pref =  getPreferences(MODE_PRIVATE);
+		Editor editor = pref.edit();
+		String dataStr = serviceClassId + "#" + dateStr +"#" + 
+				fromServiceInfo.getServiceId()+"#" + fromServiceInfo.getServiceCode() + "#"+fromServiceInfo.getServiceName() + "#"+ 
+				toServiceInfo.getServiceId()+"#" + fromServiceInfo.getServiceCode()+ "#" +toServiceInfo.getServiceName();
+		editor.putString("SEARCH_DATA", dataStr);
+		editor.commit();
 	}
 
 	private Response.Listener<String> fromSeachSuccessHandler() {
@@ -371,7 +423,7 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 				intent.putExtra("FROM", fromServiceInfo.getServiceName());
 				intent.putExtra("TO", toServiceInfo.getServiceName());
 				intent.putExtra("DATE", journeyDateButton.getText().toString());
-				MainActivity.this.startActivityForResult(intent, 0);
+				MainActivity.this.startActivity(intent);
 			}
 		};
 	}
@@ -401,23 +453,4 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy",Locale.US);
 		journeyDateButton.setText(formatter.format(cal.getTime()));
 	}
-
-	/*@Override
-	protected void onSaveInstanceState(Bundle bundle) {
-		bundle.putSerializable("fromServiceInfo", fromServiceInfo);
-		bundle.putSerializable("toServiceInfo",toServiceInfo);
-		bundle.putString("journeyDate", journeyDateButton.getText().toString());
-		super.onSaveInstanceState(bundle);
-	}
-
-	@Override
-	protected void onRestoreInstanceState(Bundle bundle) {
-		if(bundle!=null)
-		{
-			fromServiceInfo = (ServiceInfo) bundle.getSerializable("fromServiceInfo");
-			toServiceInfo = (ServiceInfo) bundle.getSerializable("toServiceInfo");
-			journeyDateStr = bundle.getString("journeyDate");
-		}
-		super.onRestoreInstanceState(bundle);
-	}*/
 }

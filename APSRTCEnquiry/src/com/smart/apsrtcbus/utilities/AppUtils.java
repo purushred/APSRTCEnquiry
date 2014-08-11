@@ -136,9 +136,13 @@ public class AppUtils {
 				resultVO.setAdultFare(nodeList.item(i+7).getFirstChild().getNodeValue().trim());
 				resultVO.setChildFare(nodeList.item(i+8).getFirstChild().getNodeValue().trim());
 				resultVO.setType(nodeList.item(i+9).getFirstChild().getNodeValue().trim());
-				resultVO.setAvailableSeats(nodeList.item(i+10).getFirstChild().getNodeValue().trim());
+				String seats = nodeList.item(i+10).getFirstChild().getNodeValue().trim();
+				if(seats.contains("("))
+				{
+					seats = seats.split(Pattern.quote("("))[0].trim()+" WL";
+				}
+				resultVO.setAvailableSeats(seats);
 				serviceInfoList.add(resultVO);
-//				Log.e("RESULT",resultVO.toString());
 			}
 
 		} catch (XPathExpressionException e) {
@@ -169,7 +173,6 @@ public class AppUtils {
 				ServiceInfo info = new ServiceInfo(nodeList.item(i).getNodeValue(),
 						nodeList.item(i+1).getNodeValue(),nodeList.item(i+2).getNodeValue());
 				serviceInfoList.add(info);
-//				Log.e("APSRTC",info.toString());
 			}
 
 		} catch (XPathExpressionException e) {

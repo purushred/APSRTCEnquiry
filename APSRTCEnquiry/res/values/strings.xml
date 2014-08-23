@@ -11,11 +11,6 @@
     <string name="save_str">Save</string>
     <string name="arrow">Arrow</string>
 
-    <string-array name="serviceTypeArray">
-        <item>A/C Service</item>
-        <item>Non-A/C Service</item>
-    </string-array>
-
     <string name="previousDate">&lt;</string>
     <string name="nextDate">&gt;</string>
     <string name="refresh_image">Refresh Image</string>

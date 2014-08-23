@@ -33,7 +33,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -111,7 +112,6 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 
 	private void displayMainScreen()
 	{
-
 		setContentView(R.layout.activity_main);
 		journeyDateButton = (Button) findViewById(R.id.journeyDateButton);
 		getFromDB();
@@ -122,8 +122,7 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 		progress.setIndeterminate(true);
 
 		adView = (AdView)this.findViewById(R.id.adMobView);
-		AdRequest adRequest = new AdRequest.Builder()
-		.build();
+		AdRequest adRequest = new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
 	}
 
@@ -247,10 +246,9 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 	public void searchButtonClickHandler(View v) {
 
 		Button journeyDateButton = (Button) findViewById(R.id.journeyDateButton);
-		Spinner spinner = (Spinner) findViewById(R.id.serviceTypeCombo);
-
+		RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+		
 		String dateStr = journeyDateButton.getText().toString();
-		String serviceType = (String) spinner.getSelectedItem();
 
 		if(fromServiceInfo==null || fromServiceInfo.getServiceCode()==null || fromServiceInfo.getServiceCode().length()<=0)
 		{
@@ -278,7 +276,7 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 		}
 
 
-		if(serviceType.equals("A/C Service"))
+		if(radioGroup.getCheckedRadioButtonId()==R.id.acService)
 		{
 			serviceClassId = 200;
 		}
@@ -308,15 +306,17 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 		{
 			String[] dataArr = searchData.split("#");
 			String serviceClassIdStr = dataArr[0];
-			Spinner spinner = (Spinner) findViewById(R.id.serviceTypeCombo);
+			
 			if(serviceClassIdStr.equals("200"))
 			{
-				spinner.setSelection(0);
+				RadioButton radioButton = (RadioButton) findViewById(R.id.acService);
+				radioButton.setSelected(true);
 				serviceClassId = 200;
 			}
 			else
 			{
-				spinner.setSelection(1);
+				RadioButton radioButton = (RadioButton) findViewById(R.id.nonAcService);
+				radioButton.setSelected(true);
 				serviceClassId = 201;
 			}
 

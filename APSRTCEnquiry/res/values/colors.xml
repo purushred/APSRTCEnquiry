@@ -2,11 +2,19 @@
 <resources>
 
     <color name="actionbar_text">#FFFFFF</color>
-    <color name="actionbar_background">#0A64A4</color>
+    <!-- <color name="actionbar_background">#0A64A4</color> -->
+    <color name="actionbar_background">#259aa2</color>
     <color name="red_color">#FF9966</color>
     <color name="white_color">#FFFFFF</color>
     <color name="black_color">#000000</color>
     <color name="green_color">#99CC00</color>
     <color name="blue_color">#00CCFF</color>
+    
+    <color name="orange_color">#ffb61c</color>
+    <color name="blue_color_light">#2ec1cc</color>
+	<color name="green_color_light">#1c7ebb</color>
+	<color name="green_color_success">#1a8468</color>
+    <!-- <color name="gray_color">#969688</color> -->
+    <color name="gray_color">#69695F</color>
 
 </resources>

@@ -35,3 +35,6 @@
     protected Object[][] getContents();
 }
 
+-dontwarn com.squareup.okhttp.**
+-dontwarn java.nio.file.*
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement

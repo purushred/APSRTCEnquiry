@@ -5,138 +5,144 @@
     xmlns:app="http://schemas.android.com/apk/res/com.smart.apsrtcbus"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center" >
+    android:layout_gravity="center"
+    android:gravity="center"
+    tools:context=".MainActivity" 
+    android:orientation="vertical">
 
-    <android.support.v7.widget.GridLayout
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:columnCount="6"
-        android:focusableInTouchMode="true"
-        android:gravity="center"
-        android:useDefaultMargins="true"
-        app:orientation="vertical"
-        tools:context=".MainActivity" >
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp" />
 
-        <EditText
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center" 
+        android:visibility="gone">
+
+        <TextView
             android:id="@+id/fromAuto"
-            android:layout_width="200dp"
-            android:layout_marginTop="20dp"
-            app:layout_column="1"
-            app:layout_columnSpan="4"
-            app:layout_row="0"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_below="@+id/progressBar"
+            android:layout_margin="10dp"
+            android:background="@drawable/search_shape"
+            android:clickable="true"
+            android:completionThreshold="1"
+            android:editable="false"
+            android:gravity="center_vertical"
+            android:height="45dp"
             android:hint="@string/from_str"
+            android:paddingLeft="5dp"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/gray_color" />
 
-        <ImageButton
-            android:id="@+id/fromSearchButton"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="20dp"
-            app:layout_column="5"
-            app:layout_row="0"
-            android:background="@drawable/oval_shape"
-            android:contentDescription="@string/search_str"
-            android:gravity="center"
-            android:onClick="fromSearchButtonClickHandler"
-            android:src="@drawable/ic_action_search_light" />
-
-        <EditText
+        <TextView
             android:id="@+id/toAuto"
-            android:layout_width="200dp"
-            android:layout_marginTop="10dp"
-            app:layout_column="1"
-            app:layout_columnSpan="4"
-            app:layout_row="1"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_below="@+id/fromAuto"
+            android:layout_margin="10dp"
+            android:background="@drawable/search_shape"
+            android:clickable="true"
+            android:completionThreshold="1"
+            android:editable="false"
+            android:gravity="center_vertical"
+            android:height="45dp"
             android:hint="@string/to_str"
+            android:paddingLeft="5dp"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/gray_color" />
 
-        <ImageButton
-            android:id="@+id/toSearchButton"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"
-            app:layout_column="5"
-            app:layout_row="1"
-            android:background="@drawable/oval_shape"
-            android:contentDescription="@string/search_str"
-            android:onClick="toSearchButtonClickHandler"
-            android:src="@drawable/ic_action_search_light" />
-
-        <Button
-            android:id="@+id/previousDateButton"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="10dp"
-            app:layout_column="0"
-            app:layout_columnSpan="1"
-            app:layout_row="2"
-            android:background="@drawable/rectangle_shape"
-            android:contentDescription="@string/previousDate"
-            android:drawableLeft="@drawable/ic_action_previous_item"
-            android:onClick="previousDateButtonClickHandler"
-            android:padding="2dp" />
-
-        <Button
-            android:id="@+id/journeyDateButton"
-            android:layout_width="200dp"
-            android:layout_marginTop="10dp"
-            app:layout_column="1"
-            app:layout_columnSpan="4"
-            app:layout_row="2"
-            android:background="@drawable/rectangle_shape"
-            android:drawableLeft="@drawable/ic_action_go_to_today"
-            android:onClick="dateButtonClickHandler"
-            android:padding="2dp"
-            android:textColor="@color/white_color" />
-
-        <Button
-            android:id="@+id/nextDateButton"
+        <LinearLayout
+            android:id="@+id/layoutId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/toAuto"
-            android:layout_marginTop="10dp"
-            app:layout_column="5"
-            app:layout_row="2"
-            android:background="@drawable/rectangle_shape"
-            android:drawableLeft="@drawable/ic_action_next_item"
-            android:onClick="nextDateButtonClickHandler"
-            android:padding="2dp" />
+            android:layout_margin="10dp" >
+
+            <Button
+                android:id="@+id/previousDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rectangle_shape"
+                android:contentDescription="@string/previousDate"
+                android:drawableLeft="@drawable/ic_action_previous_item"
+                android:onClick="previousDateButtonClickHandler"
+                android:padding="2dp" />
+
+            <Button
+                android:id="@+id/journeyDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/rectangle_shape"
+                android:drawableLeft="@drawable/ic_action_go_to_today"
+                android:onClick="dateButtonClickHandler"
+                android:padding="2dp"
+                android:textColor="@color/white_color" />
+
+            <Button
+                android:id="@+id/nextDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rectangle_shape"
+                android:drawableLeft="@drawable/ic_action_next_item"
+                android:onClick="nextDateButtonClickHandler"
+                android:padding="2dp" />
+        </LinearLayout>
 
         <RadioGroup
             android:id="@+id/radioGroup"
-            android:layout_width="200dp"
-            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layoutId"
             android:layout_marginLeft="10dp"
-            app:layout_column="1"
-            app:layout_columnSpan="4"
-            app:layout_row="3"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
             android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/allService"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="All"
+                android:textColor="@color/gray_color" />
 
             <RadioButton
                 android:id="@+id/acService"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
                 android:text="AC"
                 android:textColor="@color/gray_color" />
 
             <RadioButton
                 android:id="@+id/nonAcService"
-                android:layout_marginLeft="20dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
                 android:text="Non-AC"
                 android:textColor="@color/gray_color" />
         </RadioGroup>
 
         <Button
             android:id="@+id/searchButton"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="50dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/radioGroup"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="2dp"
             android:layout_marginTop="10dp"
-            app:layout_column="1"
-            app:layout_columnSpan="4"
-            app:layout_row="4"
             android:background="@drawable/green_rectangle_shape"
             android:drawableLeft="@drawable/ic_action_search_light"
             android:onClick="searchButtonClickHandler"
@@ -147,11 +153,11 @@
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adMobView"
-            app:layout_column="0"
-            app:layout_columnSpan="6"
-            app:layout_row="5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/searchButton"
             ads:adSize="SMART_BANNER"
             ads:adUnitId="a152e400ddeaf07" />
-    </android.support.v7.widget.GridLayout>
+    </RelativeLayout>
 
 </LinearLayout>

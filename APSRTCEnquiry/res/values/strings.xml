@@ -5,20 +5,13 @@
     <string name="from_str">From</string>
     <string name="to_str">To</string>
     <string name="date_str">Journey Date</string>
-    <string name="service_str">Service Class</string>
-    <string name="select_str">Select</string>
     <string name="search_str">Search</string>
-    <string name="save_str">Save</string>
-    <string name="arrow">Arrow</string>
-
     <string name="previousDate">&lt;</string>
     <string name="nextDate">&gt;</string>
-    <string name="refresh_image">Refresh Image</string>
-    <string name="back_image">Back Image</string>
     <string name="previous_date">Previous Date</string>
     <string name="searching">Searching..</string>
-    <string name="station_field_validation">Please enter 3 characters.</string>
-    <string name="journey_date_validation">Journey date should be greater than today\'s date.</string>
+    <string name="journey_date_validation">Journey date is older than today\'s date.</string>
     <string name="communication_error">Communication error. Please try again.</string>
+    <string name="title_activity_station_list">StationListActivity</string>
 
 </resources>

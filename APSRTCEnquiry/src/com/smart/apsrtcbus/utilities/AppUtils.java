@@ -16,6 +16,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
@@ -29,14 +31,10 @@ import com.smart.apsrtcbus.vo.ServiceInfo;
 public class AppUtils {
 
 	public static final String SITE_URL = "http://apsrtconline.in/oprs-web/";
-	
-	public static final String FROM_URL =  SITE_URL + "ajax/booking/start/places.do?startPlaceName=";
-	
-	public static final String TO_URL = SITE_URL+"ajax/booking/end/places.do?endPlaceName=";
-	
+
 	// searchType=0 for onward and 1 for return journey
 	public static final String SEARCH_URL = SITE_URL+"forward/booking/avail/services.do?adultMale=1&childMale=0&";
-	
+
 	/**
 	 * To check whether internet is enabled.
 	 * @param cm - Connectivity Manager class
@@ -59,26 +57,34 @@ public class AppUtils {
 		}
 		return status;
 	}
-	
+
 	/**
 	 * This method will parse the HTML response returned from the FROM_URL
 	 * and prepare an XML format to parse the station information.	
 	 * @param response
 	 * @return 
 	 */
-	
-	public static List<ServiceInfo> parseBusStations(String response) {
 
-		String strArr[] = response.split("PlaceDivIdTbl");
-		String data = "";
-		if(strArr.length>1)
-		{
-			data = "<table class=\"dummy"+strArr[1].replaceAll("&nbsp;", "");
-			data=data.split("</table>")[0];
-			data += "</table>";
-			return extractData(data);
+	public static String parseBusStations(String response) {
+		int startIndex = response.indexOf("jsondata =");
+		int endIndex = response.indexOf("</script>",startIndex);
+
+		String str = response.substring(startIndex, endIndex);
+		String data = str.split("=")[1];
+		return data;
+	}
+
+	public static List<ServiceInfo> getBusStationList(String data) {
+		JSONArray array = null;
+		try {
+			array = new JSONArray(data);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return null;
+
+		return ServiceInfo.fromJson(array);
+		
 	}
 
 	/** 
@@ -90,98 +96,67 @@ public class AppUtils {
 	public static ArrayList<SearchResultVO> formatData(String response)
 	{
 		String strArr[] = response.split("BoxBorder");
-		String data = "";
+
 		if(strArr.length>1)
 		{
-			data = "<table class=\"dummy"+strArr[1].replaceAll("&nbsp;", "");
+			String data = "<table class=\"dummy"+strArr[1].replaceAll("&nbsp;", "");
 			data = data.substring(0, data.lastIndexOf("</table>"));
 			data += "</table>";
-			data = data.replaceAll("\\n", " ");
-			data = data.replaceAll("\\t", " ");
 			Pattern p = Pattern.compile(Pattern.quote("'0');\">"));
 			Matcher m = p.matcher(data);
 			data = m.replaceAll("'0');\"/>");
-			return extractSearchData(data);
+			ArrayList<SearchResultVO> searchData = extractSearchData(data);
+			return searchData;
 		}
 		return new ArrayList<SearchResultVO>();
 	}
-	
+
 	/**
 	 * This method will parse the XML and form a ServiceInfo list which will be
 	 * returned to populate in the popup view.
 	 * @param data
 	 */
-	
+
 	public static ArrayList<SearchResultVO> extractSearchData(String data)
 	{
 		ArrayList<SearchResultVO> serviceInfoList = new ArrayList<SearchResultVO>();
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xpath = xpathFactory.newXPath();
-
+		data = data.replaceAll("&", "");
 		InputSource source = new InputSource(new StringReader(data));
 		try 
 		{
 			String expression = "/table/tr[(@class='oddRow') or (@class='evenRow')]/td";
 			NodeList nodeList = (NodeList) xpath.compile(expression).evaluate(source, XPathConstants.NODESET);
 			int length = nodeList.getLength();
-			if(length>1)
-			for (int i = 0; i < length; i=i+12) {
-				SearchResultVO resultVO = new SearchResultVO();
-				resultVO.setServiceName(nodeList.item(i+1).getFirstChild().getNodeValue().trim());
-				resultVO.setDepotName(nodeList.item(i+2).getFirstChild().getNodeValue().trim());
-				resultVO.setViaPlace(nodeList.item(i+3).getFirstChild().getNodeValue().trim());
-				resultVO.setDistance(nodeList.item(i+4).getFirstChild().getNodeValue().trim());
-				resultVO.setDeparture(nodeList.item(i+5).getFirstChild().getNodeValue().trim());
-				resultVO.setArrival(nodeList.item(i+6).getFirstChild().getNodeValue().trim());
-				resultVO.setAdultFare(nodeList.item(i+7).getFirstChild().getNodeValue().trim());
-				resultVO.setChildFare(nodeList.item(i+8).getFirstChild().getNodeValue().trim());
-				resultVO.setType(nodeList.item(i+9).getFirstChild().getNodeValue().trim());
-				String seats = nodeList.item(i+10).getFirstChild().getNodeValue().trim();
-				if(seats.contains("("))
-				{
-					seats = seats.split(Pattern.quote("("))[0].trim()+" WL";
+			if(length>1) {
+				SearchResultVO resultVO;
+				for (int i = 0; i < length; i=i+12) {
+					resultVO = new SearchResultVO();
+					resultVO.setServiceName(nodeList.item(i+1).getFirstChild().getNodeValue().trim());
+					resultVO.setDepotName(nodeList.item(i+2).getFirstChild().getNodeValue().trim());
+					resultVO.setViaPlace(nodeList.item(i+3).getFirstChild().getNodeValue().trim());
+					resultVO.setDistance(nodeList.item(i+4).getFirstChild().getNodeValue().trim());
+					resultVO.setDeparture(nodeList.item(i+5).getFirstChild().getNodeValue().trim());
+					resultVO.setArrival(nodeList.item(i+6).getFirstChild().getNodeValue().trim());
+					resultVO.setAdultFare(nodeList.item(i+7).getFirstChild().getNodeValue().trim());
+					resultVO.setChildFare(nodeList.item(i+8).getFirstChild().getNodeValue().trim());
+					resultVO.setType(nodeList.item(i+9).getFirstChild().getNodeValue().trim());
+					String seats = nodeList.item(i+10).getFirstChild().getNodeValue().trim();
+					if(seats.contains("("))
+					{
+						seats = seats.split(Pattern.quote("("))[0].trim()+" WL";
+					}
+					resultVO.setAvailableSeats(seats);
+					serviceInfoList.add(resultVO);
 				}
-				resultVO.setAvailableSeats(seats);
-				serviceInfoList.add(resultVO);
 			}
-
 		} catch (XPathExpressionException e) {
 			Log.e("APSRTC",e.getMessage());
 		}
 		return serviceInfoList;
 	}
-	
-	
-	/**
-	 * This method will parse the XML and form a ServiceInfo list which will be
-	 * returned to populate in the popup view.
-	 * @param data
-	 */
-	
-	public static List<ServiceInfo> extractData(String data)
-	{
-		List<ServiceInfo> serviceInfoList = new ArrayList<ServiceInfo>();
-		XPathFactory xpathFactory = XPathFactory.newInstance();
-		XPath xpath = xpathFactory.newXPath();
 
-		InputSource source = new InputSource(new StringReader(data));
-		try 
-		{
-			String expression = "//input/@value";
-			NodeList nodeList = (NodeList) xpath.compile(expression).evaluate(source, XPathConstants.NODESET);
-			for (int i = 0; i < nodeList.getLength(); i=i+3) {
-				ServiceInfo info = new ServiceInfo(nodeList.item(i).getNodeValue(),
-						nodeList.item(i+1).getNodeValue(),nodeList.item(i+2).getNodeValue());
-				serviceInfoList.add(info);
-			}
-
-		} catch (XPathExpressionException e) {
-			Log.e("APSRTC",e.getMessage());
-		}
-		return serviceInfoList;
-	}
-	
-	
 	/**
 	 * This method is to increment/decrement a date by 1 day.
 	 * @param operation - -1 for decrement and 1 for increment.
@@ -207,7 +182,7 @@ public class AppUtils {
 
 			Date newDate = cal.getTime();
 			return formatter.format(newDate);
-			
+
 		} catch (ParseException e) {
 			Log.e("Error", e.getMessage());
 		}

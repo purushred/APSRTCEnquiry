@@ -35,9 +35,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.smart.apsrtcbus.task.StationInfoAsyncTask;
 import com.smart.apsrtcbus.utilities.AppUtils;
 import com.smart.apsrtcbus.vo.SearchResultVO;
-import com.smart.apsrtcbus.vo.ServiceInfo;
+import com.smart.apsrtcbus.vo.StationVO;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -49,15 +50,16 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 	private TextView toTextView;
 	private Button journeyDateButton;
 
-	private ServiceInfo fromServiceInfo = null;
-	private ServiceInfo toServiceInfo = null;
+	private StationVO fromServiceInfo = null;
+	private StationVO toServiceInfo = null;
 
 	private ProgressDialog progress = null;
 	private short serviceClassId = 0;
 
-	public static List<ServiceInfo> stationList;
+	public static List<StationVO> stationList;
 	private OkHttpClient httpClient = null;
 	private Handler handler = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -80,16 +82,19 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 		LinearLayout layout = new LinearLayout(this);
 		layout.setGravity(Gravity.CENTER);
 		layout.setOrientation(LinearLayout.VERTICAL);
-		ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+		ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 
+				ViewGroup.LayoutParams.MATCH_PARENT);
 		layout.setLayoutParams(params);
 		TextView view = new TextView(this);
-		ViewGroup.LayoutParams params1 = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		ViewGroup.LayoutParams params1 = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 
+				ViewGroup.LayoutParams.WRAP_CONTENT);
 		view.setGravity(Gravity.CENTER);
 		view.setLayoutParams(params1);
 		view.setText("No Network connection.");
 
 		Button checkButton = new Button(this);
-		ViewGroup.LayoutParams params2 = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		ViewGroup.LayoutParams params2 = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 
+				ViewGroup.LayoutParams.WRAP_CONTENT);
 		checkButton.setText("Refresh");
 		checkButton.setLayoutParams(params2);
 		checkButton.setOnClickListener(new View.OnClickListener() {
@@ -116,7 +121,6 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 		journeyDateButton = (Button) findViewById(R.id.journeyDateButton);
 		httpClient = new OkHttpClient();
 		handler = new Handler();
-
 		try {
 			getStationInfo();
 		} catch (IOException e) {
@@ -136,13 +140,11 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 	private void getStationInfo() throws IOException
 	{
 		SharedPreferences pref =  getPreferences(MODE_PRIVATE);
-		String jsonData = pref.getString("STATION_INFO", null);
+		String jsonData = pref.getString("STATION_LIST", null);
 
 		if(jsonData==null)
 		{
-			Request request = new Request.Builder()
-			.url(AppUtils.SITE_URL).build();
-			httpClient.newCall(request).enqueue(this);
+			new StationInfoAsyncTask(this).execute();
 		}
 		else
 		{
@@ -210,12 +212,12 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 
 		String dateStr = journeyDateButton.getText().toString();
 
-		if(fromServiceInfo==null || fromServiceInfo.getServiceId()==null || fromServiceInfo.getServiceId().length()<=0)
+		if(fromServiceInfo==null || fromServiceInfo.getId()==null || fromServiceInfo.getId().length()<=0)
 		{
 			Toast.makeText(this, "Please enter valid 'From' station.", Toast.LENGTH_LONG).show();
 			return;
 		}
-		if(toServiceInfo==null || toServiceInfo.getServiceId()==null || toServiceInfo.getServiceId().length()<=0)
+		if(toServiceInfo==null || toServiceInfo.getId()==null || toServiceInfo.getId().length()<=0)
 		{
 			Toast.makeText(this, "Please enter valid 'To' station.", Toast.LENGTH_LONG).show();
 			return;
@@ -256,8 +258,8 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 
 		String url = "serviceClassId="+serviceClassId+"&concessionId=1347688949874&" +
 				"txtJourneyDate="+dateStr+"&txtReturnJourneyDate="+ dateStr +
-				"&searchType=0&startPlaceId="+fromServiceInfo.getServiceId()+
-				"&endPlaceId="+toServiceInfo.getServiceId();
+				"&searchType=0&startPlaceId="+fromServiceInfo.getId()+
+				"&endPlaceId="+toServiceInfo.getId();
 
 		storeInDB(serviceClassId,dateStr,fromServiceInfo,toServiceInfo);
 		try {
@@ -279,7 +281,7 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 	 */
 	private void getFromDB(){
 		SharedPreferences pref =  getPreferences(MODE_PRIVATE);
-		String searchData = pref.getString("SEARCH_DATA", null);
+		String searchData = pref.getString("LAST_SEARCH_DATA", null);
 		fromTextView = (TextView) findViewById(R.id.fromAuto);
 		toTextView = (TextView) findViewById(R.id.toAuto);
 
@@ -330,11 +332,11 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 			Button journeyDateButton = (Button) findViewById(R.id.journeyDateButton);
 			journeyDateButton.setText(dataArr[1]);
 
-			fromServiceInfo = new ServiceInfo(dataArr[2], dataArr[3], dataArr[4]);
-			toServiceInfo = new ServiceInfo(dataArr[5], dataArr[6], dataArr[7]);
+			fromServiceInfo = new StationVO(dataArr[2], dataArr[3]);
+			toServiceInfo = new StationVO(dataArr[4], dataArr[5]);
 
-			fromTextView.setText(fromServiceInfo.getServiceName());
-			toTextView.setText(toServiceInfo.getServiceName());
+			fromTextView.setText(fromServiceInfo.getValue());
+			toTextView.setText(toServiceInfo.getValue());
 		}
 		else
 		{
@@ -354,16 +356,15 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 	 * @param toServiceInfo
 	 */
 	private void storeInDB(short serviceClassId, String dateStr, 
-			ServiceInfo fromServiceInfo, ServiceInfo toServiceInfo) {
+			StationVO fromServiceInfo, StationVO toServiceInfo) {
 		SharedPreferences pref =  getPreferences(MODE_PRIVATE);
 		Editor editor = pref.edit();
 		String dataStr = serviceClassId + "#" + dateStr +"#" + 
-				fromServiceInfo.getServiceId()+"#" 
-				+ fromServiceInfo.getServiceCode() 
-				+ "#"+fromServiceInfo.getServiceName() + "#"
-				+ toServiceInfo.getServiceId()+"#" 
-				+ fromServiceInfo.getServiceCode()+ "#" +toServiceInfo.getServiceName();
-		editor.putString("SEARCH_DATA", dataStr);
+				fromServiceInfo.getId()
+				+ "#"+fromServiceInfo.getValue() + "#"
+				+ toServiceInfo.getId()
+				+ "#" +toServiceInfo.getValue();
+		editor.putString("LAST_SEARCH_DATA", dataStr);
 		editor.commit();
 	}
 
@@ -372,7 +373,7 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 		super.onActivityResult(requestCode, resultCode, intent);
 		if(resultCode==RESULT_OK)
 		{
-			ServiceInfo serviceInfo = (ServiceInfo) intent.getSerializableExtra("ServiceInfo");
+			StationVO serviceInfo = (StationVO) intent.getSerializableExtra("ServiceInfo");
 			String type = intent.getStringExtra("Type");
 			if(type.equals("From"))
 			{
@@ -414,40 +415,20 @@ public class MainActivity extends ActionBarActivity implements DatePickerDialog.
 	@Override
 	public void onResponse(Response response) throws IOException {
 
-		if(response.request().urlString().equals(AppUtils.SITE_URL))
-		{
-			String jsonData = AppUtils.parseBusStations(response.body().string());
-			SharedPreferences pref =  getPreferences(MODE_PRIVATE);
-			Editor editor = pref.edit();
-			editor.putString("STATION_INFO", jsonData);
-			editor.commit();
-			stationList = AppUtils.getBusStationList(jsonData);
-			handler.post(new Runnable() {
-				public void run() {
-					ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
-					RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
-
-					progressBar.setVisibility(View.GONE);
-					relativeLayout.setVisibility(View.VISIBLE);
-				}
-			});
-		}
-		else {
-			progress.cancel();
-			ArrayList<SearchResultVO> list = AppUtils.formatData(response.body().string());
-			SearchResultVO resultVO = new SearchResultVO();
-			resultVO.setServiceName("Service");
-			resultVO.setDeparture("Departure");
-			resultVO.setArrival("Arrival");
-			resultVO.setAvailableSeats("Seats");
-			resultVO.setAdultFare("Fare");
-			list.add(0, resultVO);
-			Intent intent = new Intent().setClass(MainActivity.this, SearchResultListActivity.class);
-			intent.putParcelableArrayListExtra("SearchResults",list);
-			intent.putExtra("FROM", fromServiceInfo.getServiceName());
-			intent.putExtra("TO", toServiceInfo.getServiceName());
-			intent.putExtra("DATE", journeyDateButton.getText().toString());
-			startActivity(intent);
-		}
+		progress.cancel();
+		ArrayList<SearchResultVO> list = AppUtils.formatData(response.body().string());
+		SearchResultVO resultVO = new SearchResultVO();
+		resultVO.setServiceName("Service");
+		resultVO.setDeparture("Departure");
+		resultVO.setArrival("Arrival");
+		resultVO.setAvailableSeats("Seats");
+		resultVO.setAdultFare("Fare");
+		list.add(0, resultVO);
+		Intent intent = new Intent().setClass(MainActivity.this, SearchResultListActivity.class);
+		intent.putParcelableArrayListExtra("SearchResults",list);
+		intent.putExtra("FROM", fromServiceInfo.getValue());
+		intent.putExtra("TO", toServiceInfo.getValue());
+		intent.putExtra("DATE", journeyDateButton.getText().toString());
+		startActivity(intent);
 	}
 }

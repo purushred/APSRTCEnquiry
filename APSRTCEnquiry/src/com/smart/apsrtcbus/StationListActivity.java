@@ -13,7 +13,7 @@ import android.widget.ListView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.smart.apsrtcbus.vo.ServiceInfo;
+import com.smart.apsrtcbus.vo.StationVO;
 
 public class StationListActivity extends ActionBarActivity implements AdapterView.OnItemClickListener{
 
@@ -23,6 +23,7 @@ public class StationListActivity extends ActionBarActivity implements AdapterVie
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_station_list);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		type = getIntent().getStringExtra("Type");
 		if(type.equals("From"))
 		{
@@ -32,7 +33,7 @@ public class StationListActivity extends ActionBarActivity implements AdapterVie
 		{
 			setTitle("Select To Station");
 		}
-		final ArrayAdapter<ServiceInfo> adapter = new ArrayAdapter<ServiceInfo>  
+		final ArrayAdapter<StationVO> adapter = new ArrayAdapter<StationVO>  
 		(this,android.R.layout.simple_list_item_1,MainActivity.stationList);
 
 		ListView stationListView = (ListView) findViewById(R.id.stationListView);
@@ -64,9 +65,9 @@ public class StationListActivity extends ActionBarActivity implements AdapterVie
 	@Override
 	public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
-		ServiceInfo item = (ServiceInfo) adapterView.getItemAtPosition(position);
+		StationVO item = (StationVO) adapterView.getItemAtPosition(position);
 		int serviceInfoLocation = MainActivity.stationList.indexOf(item);
-		ServiceInfo serviceInfo = MainActivity.stationList.get(serviceInfoLocation);
+		StationVO serviceInfo = MainActivity.stationList.get(serviceInfoLocation);
 
 		Intent intent = new Intent();
 		intent.putExtra("ServiceInfo", serviceInfo);

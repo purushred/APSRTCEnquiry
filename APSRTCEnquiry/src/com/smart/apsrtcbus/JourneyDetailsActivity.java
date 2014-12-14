@@ -23,7 +23,7 @@ public class JourneyDetailsActivity extends ActionBarActivity{
 		super.onCreate(icicle);
 
 		setContentView(R.layout.activity_journey_details);
-
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		TextView fromTextView = (TextView) findViewById(R.id.textView001);
 		TextView toTextView = (TextView) findViewById(R.id.textView002);
 		TextView serviceNameTextView = (TextView) findViewById(R.id.textView12);

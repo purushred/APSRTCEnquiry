@@ -1,6 +1,7 @@
 package com.smart.apsrtcbus.utilities;
 
 import java.io.StringReader;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,8 +17,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
@@ -25,12 +24,16 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.smart.apsrtcbus.vo.SearchResultVO;
-import com.smart.apsrtcbus.vo.ServiceInfo;
+import com.smart.apsrtcbus.vo.StationVO;
 
 public class AppUtils {
 
 	public static final String SITE_URL = "http://apsrtconline.in/oprs-web/";
+
+	public static final String STATION_INFO_URL = "http://apsrtc-reddy.rhcloud.com/";
 
 	// searchType=0 for onward and 1 for return journey
 	public static final String SEARCH_URL = SITE_URL+"forward/booking/avail/services.do?adultMale=1&childMale=0&";
@@ -74,17 +77,13 @@ public class AppUtils {
 		return data;
 	}
 
-	public static List<ServiceInfo> getBusStationList(String data) {
-		JSONArray array = null;
-		try {
-			array = new JSONArray(data);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public static List<StationVO> getBusStationList(String data) {
+		Gson gson = new Gson();
+		Type collectionType = new TypeToken<List<StationVO>>() {
+	    }.getType();
+	    List<StationVO> list = gson.fromJson(data, collectionType);
 
-		return ServiceInfo.fromJson(array);
-		
+		return list;
 	}
 
 	/** 

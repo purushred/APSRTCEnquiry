@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -33,6 +32,7 @@ public class SearchResultListActivity extends ActionBarActivity{
 
 		setContentView(R.layout.search_results_list);
 
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		list = this.getIntent().getParcelableArrayListExtra("SearchResults");
 		if(savedInstanceState!=null && list==null)
 		{
@@ -44,8 +44,7 @@ public class SearchResultListActivity extends ActionBarActivity{
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				if(position>0)
 				{
 					SearchResultVO resultVO = (SearchResultVO) listView.getAdapter().getItem(position);
@@ -56,7 +55,6 @@ public class SearchResultListActivity extends ActionBarActivity{
 					intent.putExtra("DATE", SearchResultListActivity.this.getIntent().getStringExtra("DATE"));
 
 					startActivity(intent);
-					//Toast.makeText(SearchResultListActivity.this, "Departure @ "+ resultVO.getDeparture(), Toast.LENGTH_LONG).show();
 				}
 			}
 		});
@@ -78,7 +76,6 @@ public class SearchResultListActivity extends ActionBarActivity{
 		format.applyPattern("EEE dd MMM, yyyy");
 		dateTextView.setText("JOURNEY DATE : "+format.format(date));
 
-		// Look up the AdView as a resource and load a request.
 		adView = (AdView)this.findViewById(R.id.adMobView1);
 		AdRequest adRequest = new AdRequest.Builder()
 		.build();
@@ -97,5 +94,4 @@ public class SearchResultListActivity extends ActionBarActivity{
 		}
 		super.onRestoreInstanceState(savedInstanceState);
 	}
-
 }

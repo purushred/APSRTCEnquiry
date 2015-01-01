@@ -10,8 +10,6 @@
     tools:context=".MainActivity" 
     android:orientation="vertical">
 
-<!--     <include layout="@layout/toolbar" /> -->
-    
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -77,7 +75,7 @@
                 android:background="@drawable/rectangle_shape"
                 android:contentDescription="@string/previousDate"
                 android:drawableLeft="@drawable/ic_action_previous_item"
-                android:onClick="previousDateButtonClickHandler"
+                android:onClick="buttonClickHandler"
                 android:padding="2dp" />
 
             <Button
@@ -89,7 +87,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/rectangle_shape"
                 android:drawableLeft="@drawable/ic_action_go_to_today"
-                android:onClick="dateButtonClickHandler"
+                android:onClick="buttonClickHandler"
                 android:padding="2dp"
                 android:textColor="@color/white_color" />
 
@@ -99,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rectangle_shape"
                 android:drawableLeft="@drawable/ic_action_next_item"
-                android:onClick="nextDateButtonClickHandler"
+                android:onClick="buttonClickHandler"
                 android:padding="2dp" />
         </LinearLayout>
 
@@ -147,7 +145,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/green_rectangle_shape"
             android:drawableLeft="@drawable/ic_action_search_light"
-            android:onClick="searchButtonClickHandler"
+            android:onClick="buttonClickHandler"
             android:padding="8dp"
             android:text="@string/search_str"
             android:textAppearance="?android:attr/textAppearanceMedium"

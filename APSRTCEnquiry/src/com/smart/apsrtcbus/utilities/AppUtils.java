@@ -12,13 +12,18 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.NodeList;
+import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -37,6 +42,8 @@ public class AppUtils {
 
 	// searchType=0 for onward and 1 for return journey
 	public static final String SEARCH_URL = SITE_URL+"forward/booking/avail/services.do?adultMale=1&childMale=0&";
+
+	public static final String MAIN_SEARCH_URL = SITE_URL+"avail/services.do?";
 
 	/**
 	 * To check whether internet is enabled.
@@ -79,10 +86,8 @@ public class AppUtils {
 
 	public static List<StationVO> getBusStationList(String data) {
 		Gson gson = new Gson();
-		Type collectionType = new TypeToken<List<StationVO>>() {
-	    }.getType();
-	    List<StationVO> list = gson.fromJson(data, collectionType);
-
+		Type collectionType = new TypeToken<List<StationVO>>() {}.getType();
+		List<StationVO> list = gson.fromJson(data, collectionType);
 		return list;
 	}
 
@@ -95,7 +100,6 @@ public class AppUtils {
 	public static ArrayList<SearchResultVO> formatData(String response)
 	{
 		String strArr[] = response.split("BoxBorder");
-
 		if(strArr.length>1)
 		{
 			String data = "<table class=\"dummy"+strArr[1].replaceAll("&nbsp;", "");
@@ -105,11 +109,70 @@ public class AppUtils {
 			Matcher m = p.matcher(data);
 			data = m.replaceAll("'0');\"/>");
 			ArrayList<SearchResultVO> searchData = extractSearchData(data);
+			//saxParser(data);
 			return searchData;
 		}
 		return new ArrayList<SearchResultVO>();
 	}
 
+	public static ArrayList<SearchResultVO> saxParser(String data){
+
+		ArrayList<SearchResultVO> serviceInfoList = new ArrayList<SearchResultVO>();
+		data = data.replaceAll("&", "");
+		try {
+			XMLReader xmlReader = SAXParserFactory.newInstance().newSAXParser()
+					.getXMLReader();
+
+			DefaultHandler handler = new DefaultHandler() {
+
+				private List<SearchResultVO> results;
+				private String tempVal;
+				private SearchResultVO resultsVO;
+
+				public List<SearchResultVO> getEmployees() {
+					return results;
+				}
+
+				// Event Handlers
+				public void startElement(String uri, String localName, String qName,
+						Attributes attributes) throws SAXException {
+
+					Log.e("ATTRVA:",attributes.getLength()+"");
+					// reset
+					tempVal = "";
+					Log.e("qName Start:",qName);
+					if (qName.equalsIgnoreCase("tr")) {
+						resultsVO = new SearchResultVO();
+					}
+				}
+				
+				public void characters(char[] ch, int start, int length)
+						throws SAXException {
+					tempVal = new String(ch, start, length);
+					Log.e("Element Value:",tempVal);
+				}
+
+				public void endElement(String uri, String localName, String qName)
+						throws SAXException {
+					Log.e("qName End:",qName);
+					if (qName.equalsIgnoreCase("tr")) {
+						// add it to the list
+						results.add(resultsVO);
+					}
+				}
+			};
+
+			xmlReader.setContentHandler(handler);
+			// the process starts
+			xmlReader.parse(new InputSource(new StringReader(data)));
+			//serviceInfoList = handler.getEmployees();
+
+		} catch (Exception ex) {
+			Log.d("XML", "SAXXMLParser: parse() failed");
+		}
+		return null;
+
+	}
 	/**
 	 * This method will parse the XML and form a ServiceInfo list which will be
 	 * returned to populate in the popup view.
@@ -125,8 +188,10 @@ public class AppUtils {
 		InputSource source = new InputSource(new StringReader(data));
 		try 
 		{
+			//Log.e("5:", new Date().getTime()+"");
 			String expression = "/table/tr[(@class='oddRow') or (@class='evenRow')]/td";
 			NodeList nodeList = (NodeList) xpath.compile(expression).evaluate(source, XPathConstants.NODESET);
+			//Log.e("6:", new Date().getTime()+"");
 			int length = nodeList.getLength();
 			if(length>1) {
 				SearchResultVO resultVO;
@@ -186,5 +251,19 @@ public class AppUtils {
 			Log.e("Error", e.getMessage());
 		}
 		return null;
+	}
+
+	public static String getFormattedDate(String dateStr){
+
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy",Locale.US);
+		Date date = null;
+		try {
+			date = format.parse(dateStr);
+		} catch (ParseException e) {
+			Log.e("Error", e.getLocalizedMessage());
+		}
+
+		format.applyPattern("EEE dd MMM, yyyy");
+		return format.format(date);
 	}
 }

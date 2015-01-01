@@ -1,6 +1,8 @@
 package com.smart.apsrtcbus.task;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import retrofit.RestAdapter;
@@ -33,7 +35,7 @@ public class StationInfoAsyncTask extends AsyncTask<Void, Void, List<StationVO>>
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		
+
 		ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progressBar);
 		RelativeLayout relativeLayout = (RelativeLayout) activity.findViewById(R.id.relativeLayout);
 
@@ -42,17 +44,19 @@ public class StationInfoAsyncTask extends AsyncTask<Void, Void, List<StationVO>>
 	}
 
 	protected void onPostExecute(List<StationVO> result) {
-		
+
 		MainActivity.stationList = result;
-		Gson gson = new Gson();
-		Type collectionType = new TypeToken<List<StationVO>>() {}.getType();
-		String jsonData = gson.toJson(result,collectionType);
-		
-		SharedPreferences pref =  activity.getPreferences(Activity.MODE_PRIVATE);
-		Editor editor = pref.edit();
-		editor.putString("STATION_LIST", jsonData);
-		editor.commit();
-		
+		if(result.size()>0) {
+			Gson gson = new Gson();
+			Type collectionType = new TypeToken<List<StationVO>>() {}.getType();
+			String jsonData = gson.toJson(result,collectionType);
+
+			SharedPreferences pref =  activity.getPreferences(Activity.MODE_PRIVATE);
+			Editor editor = pref.edit();
+			editor.putString("STATION_LIST", jsonData);
+			editor.putLong("LAST_SYNC_TIMESTAMP", new Date().getTime());
+			editor.commit();
+		}
 		ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progressBar);
 		RelativeLayout relativeLayout = (RelativeLayout) activity.findViewById(R.id.relativeLayout);
 		progressBar.setVisibility(View.GONE);
@@ -64,13 +68,11 @@ public class StationInfoAsyncTask extends AsyncTask<Void, Void, List<StationVO>>
 
 		RestAdapter adapter = new RestAdapter.Builder().setEndpoint(AppUtils.STATION_INFO_URL).build();
 		StationInfoService stationService = adapter.create(StationInfoService.class);
-		List<StationVO> stations = null;
-		try 
-		{
+		List<StationVO> stations = new ArrayList<StationVO>();
+		try {
 			stations = stationService.getStations();	
 		}
-		catch(RetrofitError err)
-		{
+		catch(RetrofitError err) {
 			Log.e("RETRO ERROR:", err.toString());
 		}
 		return stations;

@@ -1,9 +1,11 @@
 package com.smart.apsrtcbus.vo;
 
+import java.io.Serializable;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class SearchResultVO implements Parcelable  {
+public class SearchResultVO implements Parcelable,Serializable  {
 
 	private String serviceNo;
 	private String serviceName; 
